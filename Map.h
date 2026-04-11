@@ -16,6 +16,9 @@ public:
     ~Map();                             //destructor
     Map& operator=(const Map& rhs);     //assignment operator
    
+    bool isValidCordinates(int x, int y) const;    //returns true if (x,y) is a valid position in the map
+    
+
     void print() const;                 //prints map
     void print(std::vector<std::pair<int,int>>) const; //prints map and path 
 

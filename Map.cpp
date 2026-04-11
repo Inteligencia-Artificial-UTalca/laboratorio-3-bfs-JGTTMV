@@ -9,9 +9,25 @@ Map::Map():h(0),w(0){
 Map::Map(std::string filename){
     
     //Load the file
+    std::ifstream file(filename);
+    if(!file.is_open()){
+        std::cerr<<"Error opening file: "<<filename<<std::endl;
+        return;
+    }
+    // Read file information to get map dimensions
+    file>>h>>w;
+
     //Resize map
+    _map.resize(h, std::vector<int>(w));
+
     //Save file information in map
+    for(int i=0;i<h;i++){
+        for(int j=0;j<w;j++){
+            file>>_map[i][j];
+        }
+    }
     //Close file
+    file.close();
 }   
 
 Map::Map(const Map& rhs):h(rhs.h),w(rhs.w),_map(rhs._map){
@@ -60,4 +76,8 @@ void Map::print(std::vector<std::pair<int,int>> path) const{
 
 bool operator==(const Map& lhs, const Map& rhs){
     return lhs.h==rhs.h && lhs.w==rhs.w && lhs._map==rhs._map;
+}
+
+bool Map::isValidCordinates(int x, int y) const{
+return (x >= 0 && x < h && y >= 0 && y < w);
 }
