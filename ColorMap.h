@@ -5,12 +5,14 @@
 
 
 
-class ColorMap:public Map{//clase que herede de Map y reimplemente los métodos print para imprimir con colores
+class ColorMap:public Map //clase que hereda de Map y reimplementa los metodos print para imprimir con colores
+{
+private:
     std::array<int,5> colors;
 public:
     ColorMap(const Map& rhs);
-    void print() const;                 //prints map
-    void print(std::vector<std::pair<int,int>>) const; //prints map and path 
+    void print() const;                                //imprime el mapa en pantalla
+    void print(std::vector<std::pair<int,int>>) const; //imprime el mapa y el camino encontrado
 
 
 };
