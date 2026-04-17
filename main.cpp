@@ -6,65 +6,69 @@
 
 int main(int argc, char *argv[])
 {
-
-    //verifica que se hayan pasado los argumentos correctos
-    //6 argumentos: nombre del programa, archivo del mapa, x1, y1, x2, y2
-    if (argc!=6) 
+    //verificacion basica de argumentos (archivo y coordenadas)
+    if (argc != 6) 
     {
-        std::cerr<<"Error: Cantidad de argumentos incorrecta."<<std::endl;
-        std::cerr<<"Uso: "<<argv[0]<<" <map_file> <x1> <y1> <x2> <y2>"<<std::endl;
+        std::cerr << "Error: Argumentos insuficientes." << std::endl;
+        std::cerr << "Uso: " << argv[0] << " <map_file> <x1> <y1> <x2> <y2>" << std::endl;
         return 1;
     }
 
-    int start_x, start_y, goal_x, goal_y;
+    //convierte argumentos de coordenadas a enteros
+    int start_x = std::stoi(argv[2]);
+    int start_y = std::stoi(argv[3]);
+    int goal_x = std::stoi(argv[4]);
+    int goal_y = std::stoi(argv[5]);
 
-    try //convierte los argumentos de coordenadas a enteros y verifica que sean válidos
-    {
-        start_x = std::stoi(argv[2]);
-        start_y = std::stoi(argv[3]);
-        goal_x = std::stoi(argv[4]);
-        goal_y = std::stoi(argv[5]);
-    } catch(const std::invalid_argument& e){
-        std::cerr<<"Error: Argumentos de coordenadas deben ser enteros."<<std::endl;
-        return 1;
-    } catch(const std::out_of_range& e){
-        std::cerr<<"Error: Argumentos de coordenadas fuera de rango."<<std::endl;
-        return 1;
-    }
-
-    //carga el mapa desde el archivo
     Map map(argv[1]);
-
     ColorMap colorMap(map);
-    colorMap.print();
 
-    //revisa que las coordenadas de inicio y destino sean válidas dentro del mapa
-    if (!map.isValidCordinates(start_x, start_y))
-    {
-        std::cerr<<"Error: Coordenadas de inicio no válidas."<<std::endl;
-        return 1;
-    }
-    if (!map.isValidCordinates(goal_x, goal_y))
-    {
-        std::cerr<<"Error: Coordenadas de destino no válidas."<<std::endl;
+    if (!map.isValidCordinates(start_x, start_y) || !map.isValidCordinates(goal_x, goal_y)) 
+    { 
+        std::cerr << "Error: Coordenadas fuera de los límites del mapa." << std::endl;
         return 1;
     }
 
-    //llama al nuevo algoritmo Greedy en lugar de BFS
-    auto path = Search::Greedy(map, {start_x, start_y}, {goal_x, goal_y});
-
-    //si el camino no está vacío, imprimimos el mapa con el camino coloreado
-    if (!path.empty()) 
+    int opcion = 0;
+    do 
     {
+        std::cout << "\n--- MENU PRINCIPAL ---\n";
+        std::cout << "Coordenadas actuales: Inicio(" << start_x << "," << start_y << ") Destino(" << goal_x << "," << goal_y << ")\n";
+        std::cout << "1. Cambiar Coordenadas\n";
+        std::cout << "2.  A* (A-Star)\n";
+        std::cout << "3. Salir\n";
+        std::cout << "Seleccione una opcion: ";
+        std::cin >> opcion;
+
+        std::vector<std::pair<int, int>> path;
+
+        switch (opcion) //cada opcion ejecuta un algoritmo distinto
+        {
+            case 1:
+                std::cout << "Nuevo Inicio (x y): "; std::cin >> start_x >> start_y;
+                std::cout << "Nuevo Destino (x y): "; std::cin >> goal_x >> goal_y;
+                continue;
+            case 2:
+                path = Search::AStar(map, {start_x, start_y}, {goal_x, goal_y});
+                break;
+            case 3:
+                std::cout << "Saliendo del programa..." << std::endl;
+                continue; 
+            default:
+                std::cout << "Opcion no valida." << std::endl;
+                continue;
+        }
+
+        if (!path.empty()) 
+        {
         colorMap.print(path);
-    } 
-    
-    std::cout << "\n-----------------------------------\n";
-    std::cout << "Distancia del camino encontrado: " << (path.size() - 1) << " pasos." << std::endl;
-    std::cout << "-----------------------------------\n\n";
+        std::cout << "Ruta encontrada. Nodos en el camino: " << path.size() << std::endl;
+    } else if (opcion != 3) 
+    {
+        std::cout << "No se encontro ruta.\n";
+    }
 
-    std::cout << "Mapa con la ruta encontrada:\n";
-    colorMap.print(path);
-    
+    } while (opcion != 3);
+
     return 0;
 }
